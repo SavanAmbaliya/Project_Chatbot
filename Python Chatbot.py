@@ -1,3 +1,4 @@
+import argparse
 import random
 from datetime import datetime
 now = datetime.now().strftime("%H:%M:%S")
@@ -173,7 +174,105 @@ chatbot_qa = {
         "I appreciate that! Laughter is the best medicine! 😂"
     ]                        
 }
+keyword_questions={
+   
+    "semester": [
+        "What subjects are included in this semester?",
+        "How many credits are required this semester?",
+        "Can you provide notes for this semester?"
+    ],
+    "python": [
+        "Python is a popular programming language.",
+        "Python supports object-oriented programming.",
+        "You can use Python for web development, data science, and AI."
+    ],
+    "ai": [
+        "AI stands for Artificial Intelligence.",
+        "Machine learning is a subset of AI.",
+        "AI is used in daily life like voice assistants and recommendations."
+    ],
+    "cryptography": [
+        "Cryptography is the art of secure communication.",
+        "RSA is a popular public-key cryptography algorithm.",
+        "AES is a widely used symmetric encryption standard."
+    ],
+    "rsa": [
+        "RSA uses two prime numbers to generate keys.",
+        "RSA allows secure communication over insecure channels.",
+        "The private key in RSA should be kept secret."
+    ],
+    "germany": [
+        "Germany is in Europe and its capital is Berlin.",
+        "Braunschweig is a city in Lower Saxony, Germany.",
+        "Wolfenbüttel is famous for its historical architecture."
+    ],
+    "flowers": [
+        "You can give yellow flowers to friends.",
+        "Red flowers are usually for love or romance.",
+        "White flowers often symbolize purity."
+    ],
+    "insta": [
+        "Use aesthetic captions and songs for your Insta story.",
+        "Try trending hashtags to increase engagement.",
+        "Photos with soft lighting and pastel colors look nice."
+    ],
+    "uml": [
+        "UML stands for Unified Modeling Language.",
+        "Sequence diagrams show how objects interact over time.",
+        "Use case diagrams show the functionality of a system."
+    ],
+    "projects": [
+        "College projects are important for practical learning.",
+        "Choose a project topic that interests you.", 
+        "Make sure to plan your project before starting."
+    ],
+    "notes": [
+        "Notes help you revise quickly before exams.",
+        "Organize your notes by subject and topic.",
+        "Use bullet points and diagrams for better understanding."
+    ]
+}
+def is_single_word(text: str) -> bool:
+    # Remove leading/trailing spaces
+    cleaned = text.strip()
+    
+    # Split by any whitespace
+    words = cleaned.split()
+    
+    # Check if exactly one word
+    return len(words) == 1
 
+
+def get_related_question(keyword):
+    # while True:
+    #     keyword = input("\n Type a keyword(or 'exit' to stop): ")
+    #     if keyword.lower() == "exit" :
+    #         print("Goodbye!")
+    #         break
+
+# Check if the keyword exists in the dictionary
+    if keyword.lower() in keyword_questions:
+        print("\n 📌 Related Questions:")
+        questions = keyword_questions[keyword.lower()]
+
+         # Display numbered list of questions
+        for i,q in enumerate(questions, start=1):
+            print(f"{i}.{q}")
+
+        # Ask user to choose a question number
+        try:
+            choice = int(input("\n enter the numeber of your question: "))
+        except ValueError:
+            print("\n ❌ Invalid input. Please type a number.")
+        
+         # Show the selected question if valid
+        if 1 <= choice <= len(questions):
+            return print(f"\n👉 You selected: {questions[choice - 1]}")
+        else:
+            return print("❌ Invalid selection.")
+    else:
+        return print("❓ No related questions found for this keyword.") 
+        
 def get_response(user_input):
     user_input = user_input.lower().strip()
     for key in chatbot_qa:
@@ -207,7 +306,6 @@ def get_response(user_input):
             return response
     return "the user question isn't recognized and the user should ask another one. 🤔"
 
-# main function to start chat
 def chat():
     print(datetime.now().strftime('%H:%M:%S'), "Chatbot: Hi! Type 'bye' to exit.")
     while True:
@@ -215,7 +313,39 @@ def chat():
         if "bye" in user_input.lower():
             print(datetime.now().strftime('%H:%M:%S'), "Chatbot:", chatbot_qa["goodbye"])
             break
-        print(datetime.now().strftime('%H:%M:%S'), "Chatbot:", get_response(user_input))
+        if is_single_word(user_input):
+            get_related_question(user_input)
+        else:
+            print(datetime.now().strftime('%H:%M:%S'), "Chatbot:", get_response(user_input))
+
+# main function to start chat
+def main():
+    parser = argparse.ArgumentParser(description="Simple Chatbot Script")
+    parser.add_argument(
+        "--question",
+        type=str,
+        # required=True,
+        help="The question you want to ask the chatbot"
+    )
+    args = parser.parse_args()
+    if args.question:
+        if is_single_word(args.question):
+            get_related_question(args.question)
+        else:
+            answer_question(args.question)
+    else:
+        chat()
+
+
+def answer_question(question: str) -> str: 
+    user_input = question.lower().strip()
+    for key in chatbot_qa:
+        if key in user_input:
+            print(datetime.now().strftime('%H:%M:%S'), "Chatbot:", get_response(user_input))
+            return
+    return "the user question isn't recognized and the user should ask another one. 🤔"
+            
+
 
 if __name__ == "__main__":
-    chat()
+    main()
