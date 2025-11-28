@@ -394,5 +394,5 @@ def answer_question(question: str) -> str:
     return "the user question isn't recognized and the user should ask another one. 🤔"
             
 if __name__ == "__main__":
-    chatbot_qa = load_chatbot_csv("D:\python\chatbot_questions.csv")
+    chatbot_qa = load_chatbot_csv("D:\Sem_1_Project_Chatbot\Project_Chatbot\chatbot_questions.csv")
     main()
