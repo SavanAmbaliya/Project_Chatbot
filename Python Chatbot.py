@@ -1,7 +1,9 @@
 import argparse
 import random
-from datetime import datetime
 import csv
+import re
+from difflib import get_close_matches
+from datetime import datetime
 
 interesting_facts = [
     "Honey never spoils. Archaeologists have found 3,000-year-old honey in Egyptian tombs that’s still edible! 🍯",
@@ -233,6 +235,63 @@ keyword_questions={
         "Use bullet points and diagrams for better understanding."
     ]
 }
+HALL_DATA = {
+    "cryptography": {
+        "where is lecturing hall cryptography": "Am Exer 7",
+        "what is the location of lecturing hall cryptography": "Café Limes, Am Exer 7, 38302 Wolfenbüttel",
+        "where is lecturing hall cryptography located": "It is located in Wolfenbüttel near Exer Süd",
+        "how do i reach lecturing hall cryptography": "Just enter from the gate and turn left, then walk for 2 minutes."
+    },
+
+    "sicherheit": {
+        "where is lecturing hall sicherheit": "Hall E in Fachhochschule",
+        "what is the location of lecturing hall sicherheit": "Salzdahlumer Str. 46/48, 38302 Wolfenbüttel",
+        "where is lecturing hall sicherheit located": "It is located near Mittelweg Wolfenbüttel",
+        "how do i reach lecturing hall sicherheit": "Just enter from the main gate and go right from downstairs."
+    },
+
+    "software for autonomous safety critical systems": {
+        "where is lecturing hall software for autonomous safety critical systems": "Hall E in Fachhochschule",
+        "what is the location of lecturing hall software for autonomous safety critical systemst": "Salzdahlumer Str. 46/48, 38302 Wolfenbüttel",
+        "where is lecturing hall software for autonomous safety critical systems located": "It is located near Mittelweg Wolfenbüttel",
+        "how do i reach lecturing hall software for autonomous safety critical systems": "Just enter from the main gate and go right from downstairs."
+    },
+
+    "german a2.2": {
+        "where is lecturing hall german a2.2": "Am Exer 2 Raum 187",
+        "what is the location of lecturing hall german a2.2": "Am Exer 2, 38302 Wolfenbüttel",
+        "where is lecturing hall german a2.2 located": "It is located in Wolfenbüttel near Exer Süd",
+        "how do i reach lecturing hall german a2.2": "It is the 2nd room on the first floor"
+    },
+}
+def normalize(text: str) -> str:
+    text = text.lower()
+    text = re.sub(r'[^a-z0-9\s]', ' ', text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
+
+def find_hall(user_question: str):
+    for hall in HALL_DATA.keys():
+        if hall in user_question.lower():
+            return hall
+    return None
+
+def answer_question1(user_question: str) -> str:
+    norm_user_q = normalize(user_question)
+    hall = find_hall(user_question)
+
+    if not hall:
+        return "Please mention the subject name."
+
+    hall_questions = HALL_DATA[hall]
+    known_questions = list(hall_questions.keys())
+
+    matches = get_close_matches(norm_user_q, known_questions, n=1, cutoff=0.5)
+
+    if matches:
+        return hall_questions[matches[0]]
+    else:
+        return "Sorry, I don't have details for that question yet."
 def load_chatbot_csv(filepath):
     """
     Load chatbot questions and answers from a CSV file.
@@ -252,6 +311,8 @@ def load_chatbot_csv(filepath):
     return chatbot_qa
 def is_single_word(text: str) -> bool:
     # Remove leading/trailing spaces
+    if text.lower() in ["hi", "hello"]:
+        return 0
     cleaned = text.strip()
     
     # Split by any whitespace
@@ -349,7 +410,7 @@ def chat():
     while True:
         user_input = input("You: ")
         if user_input.lower() in ["exit", "quit", "bye"]:
-            print(datetime.now().strftime('%H:%M:%S'), "Chatbot:", chatbot_qa["goodbye"])
+            print(datetime.now().strftime('%H:%M:%S'), "Chatbot:", get_related_question("goodbye"))
             break
         if is_single_word(user_input):
             get_related_question(user_input)
