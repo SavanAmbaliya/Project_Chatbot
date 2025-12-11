@@ -8,7 +8,7 @@ from difflib import get_close_matches
 from datetime import datetime
 
 # ============== Configuration ==============
-QUESTIONS_CSV_FILE = "D:\\python\\questions.csv"
+QUESTIONS_CSV_FILE = "D:\\Sem_1_Project_Chatbot\\Project_Chatbot\\chatbot_questions.csv"
 # CHATBOT_CSV_FILE = "D:\\OSTFALIA\\chatbot_questions.csv"
 
 # ============== Logging Setup ==============
@@ -241,16 +241,16 @@ def list_questions():
     """List all stored questions."""
     chatbot_qa = load_questions()
     print("\nStored Questions:")
-    for q in chatbot_qa:
-        print(f"- {q}")
+    for i,q in enumerate(chatbot_qa,start=1):
+        print(f"{i}- {q}")
 
 
 def list_full():
     """List all questions with their answers."""
     chatbot_qa = load_questions()
     print("\nQuestions with Answers:")
-    for q, answers in chatbot_qa.items():
-        print(f"{q}")
+    for i, (q, answers) in enumerate(chatbot_qa.items(), start=1):
+        print(f"{i} {q}")
         for a in answers:
             print(f"   - {a}")
 
